@@ -34,7 +34,7 @@ Now, if you attempt to run your code and the appengine SDK isn't found, you'll g
 App Engine SDK not found!  Please do one of the following:
 - Set $APPENGINE_SDK
 - Make sure `dev_appserver.py` on $PATH
-- Download the SDK to ./appengine_sdk: `download-gae-sdk [--version 1.9.56] [directory]`
+- Download the SDK to ./appengine_sdk: `download-gae-sdk [--version 1.9.56] [--dir appengine_sdk]`
 ```
 
 Once you've followed the instructions in whatever manner works best for you, rerun the code and import appengine dependencies to your heart's content!

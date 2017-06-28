@@ -11,4 +11,10 @@ setup(
     url='https://github.com/kkroening/gae-sdk-path-fixer',
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    entry_points={
+        'console_scripts': [
+            'download-gae-sdk=gae_sdk_path_fixer.download_gae_sdk:main',
+        ],
+    },
+
 )

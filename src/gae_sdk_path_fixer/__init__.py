@@ -123,43 +123,29 @@ def _find_or_download_sdk(auto_download, default_dir, version):
     return sdk_path
 
 
-# From https://cloud.google.com/appengine/docs/standard/python/tools/localunittesting?csw=1
-def _fixup_paths(path):
-    """Adds GAE SDK path to system path and appends it to the google path
-    if that already exists."""
-    # Not all Google packages are inside namespace packages, which means
-    # there might be another non-namespace package named `google` already on
-    # the path and simply appending the App Engine SDK to the path will not
-    # work since the other package will get discovered and used first.
-    # This emulates namespace packages by first searching if a `google` package
-    # exists by importing it, and if so appending to its module search path.
-    try:
-        import google
-        google.__path__.append("{0}/google".format(path))
-    except ImportError:
-        pass
-
-    sys.path.insert(0, path)
-
-
-def fix_paths(auto_download=False, default_dir=DEFAULT_DIR, version=DEFAULT_VERSION):
+def fix_paths(auto_download=False, default_dir=DEFAULT_DIR, version=DEFAULT_VERSION, index=-1,
+        include_internal_imports=False):
     sdk_path = _find_or_download_sdk(auto_download, default_dir, version)
     assert sdk_path is not None, _get_error_message(version, default_dir)
 
     os.environ['APPENGINE_SDK'] = sdk_path
 
+    if index < 0:
+        # e.g., index == -1 means to add paths to the very end.
+        index = len(sys.path) + index + 1
     if sdk_path not in sys.path:
-        _fixup_paths(sdk_path)
+        sys.path.insert(index, sdk_path)
+        index += 1
 
-    already_fixed = os.path.join(sdk_path, 'lib', 'simplejson') in sys.path
-    if not already_fixed:
-        import dev_appserver
-        sys.path[1:1] = dev_appserver._PATHS.script_paths('dev_appserver.py')  # for cherrypy, portpicker, etc.
-        dev_appserver.fix_sys_path()
+    import dev_appserver
+    dev_appserver.fix_google_path()
 
-        from google.appengine.ext import vendor
-        vendor.add(sys.prefix, index=0)
-        sys.path.insert(0, '.')  # FIXME
+    more_paths = dev_appserver.EXTRA_PATHS
+    if include_internal_imports:
+        more_paths += dev_appserver._PATHS.script_paths('dev_appserver.py')  # for cherrypy, portpicker, etc.
+    more_paths = [x for x in more_paths if x not in sys.path]
+
+    sys.path[index:index] = more_paths
 
     return sdk_path
 

@@ -123,8 +123,19 @@ def _find_or_download_sdk(auto_download, default_dir, version):
     return sdk_path
 
 
+def _is_on_appengine():
+    return os.environ.get('SERVER_SOFTWARE').startswith('Google App Engine')
+
+
+def _is_on_dev_appserver():
+    return os.environ.get('SERVER_SOFTWARE').startswith('Development')
+
+
 def fix_paths(auto_download=False, default_dir=DEFAULT_DIR, version=DEFAULT_VERSION, index=-1,
         include_internal_imports=False):
+    if _is_on_appengine() or _is_on_dev_appserver():
+        return
+
     sdk_path = _find_or_download_sdk(auto_download, default_dir, version)
     assert sdk_path is not None, _get_error_message(version, default_dir)
 
@@ -146,8 +157,6 @@ def fix_paths(auto_download=False, default_dir=DEFAULT_DIR, version=DEFAULT_VERS
     more_paths = [x for x in more_paths if x not in sys.path]
 
     sys.path[index:index] = more_paths
-
-    return sdk_path
 
 
 __all__ = [

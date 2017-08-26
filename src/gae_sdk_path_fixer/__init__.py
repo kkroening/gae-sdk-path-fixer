@@ -124,11 +124,11 @@ def _find_or_download_sdk(auto_download, default_dir, version):
 
 
 def _is_on_appengine():
-    return os.environ.get('SERVER_SOFTWARE').startswith('Google App Engine')
+    return os.environ.get('SERVER_SOFTWARE', '').startswith('Google App Engine')
 
 
 def _is_on_dev_appserver():
-    return os.environ.get('SERVER_SOFTWARE').startswith('Development')
+    return os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
 
 def fix_paths(auto_download=False, default_dir=DEFAULT_DIR, version=DEFAULT_VERSION, index=-1,

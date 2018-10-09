@@ -16,7 +16,7 @@ import sys
 
 
 DEFAULT_DIR = os.path.join('.', 'appengine_sdk')
-DEFAULT_VERSION = '1.9.56'
+DEFAULT_VERSION = '1.9.75'
 DOWNLOAD_URL_FORMAT = 'https://storage.googleapis.com/appengine-sdks/featured/google_appengine_{}.zip'
 
 

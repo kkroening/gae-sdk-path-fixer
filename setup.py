@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='gae-sdk-path-fixer',
-    version='0.1.0',
+    version='0.1.1',
     description='GAE SDK Path Fixer: detect AppEngine SDK and fix Python sys.path',
     author='Karl Kroening',
     author_email='karlk@kralnet.us',

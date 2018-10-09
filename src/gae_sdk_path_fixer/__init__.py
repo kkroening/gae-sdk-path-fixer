@@ -1,5 +1,12 @@
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from past.utils import old_div
 from distutils.spawn import find_executable
-from StringIO import StringIO
+try:
+    from io import StringIO
+except ImportError:
+    from io import StringIO
 from textwrap import dedent
 from zipfile import ZipFile
 import os
@@ -16,7 +23,7 @@ DOWNLOAD_URL_FORMAT = 'https://storage.googleapis.com/appengine-sdks/featured/go
 def _download_with_progress(url, width=80):
     try:
         # Python 2
-        from urllib2 import urlopen
+        from urllib.request import urlopen
     except ImportError:
         # Python 3
         from urllib.request import urlopen
@@ -33,11 +40,11 @@ def _download_with_progress(url, width=80):
             if not chunk:
                 break
             data += chunk
-            done_percentage = float(len(data)) / float(total_size)
+            done_percentage = old_div(float(len(data)), float(total_size))
             done_bars = int(width * done_percentage)
             empty_bars = width - done_bars
             sys.stderr.write('\r[{}{}] {:.2f} / {:.2f} MB'.format('=' * done_bars, ' ' * empty_bars,
-                float(len(data)) / (1024**2), (float(total_size) / (1024**2))))
+                old_div(float(len(data)), (1024**2)), (old_div(float(total_size), (1024**2)))))
             sys.stderr.flush()
     sys.stderr.write('\n')
     return data
@@ -148,8 +155,14 @@ def fix_paths(auto_download=False, default_dir=DEFAULT_DIR, version=DEFAULT_VERS
         sys.path.insert(index, sdk_path)
         index += 1
 
+    old_cwd = os.getcwd()
     import dev_appserver
     dev_appserver.fix_google_path()
+    new_cwd = os.getcwd()
+    if new_cwd != old_cwd:
+        # Workaround for google issue 117145272.
+        # (See https://issuetracker.google.com/issues/117145272 )
+        os.chdir(old_cwd)
 
     more_paths = dev_appserver.EXTRA_PATHS
     if include_internal_imports:

@@ -1,12 +1,5 @@
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from past.utils import old_div
 from distutils.spawn import find_executable
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
+from StringIO import StringIO
 from textwrap import dedent
 from zipfile import ZipFile
 import os
@@ -16,14 +9,14 @@ import sys
 
 
 DEFAULT_DIR = os.path.join('.', 'appengine_sdk')
-DEFAULT_VERSION = '1.9.75'
+DEFAULT_VERSION = '1.9.56'
 DOWNLOAD_URL_FORMAT = 'https://storage.googleapis.com/appengine-sdks/featured/google_appengine_{}.zip'
 
 
 def _download_with_progress(url, width=80):
     try:
         # Python 2
-        from urllib.request import urlopen
+        from urllib2 import urlopen
     except ImportError:
         # Python 3
         from urllib.request import urlopen
@@ -40,11 +33,11 @@ def _download_with_progress(url, width=80):
             if not chunk:
                 break
             data += chunk
-            done_percentage = old_div(float(len(data)), float(total_size))
+            done_percentage = float(len(data)) / float(total_size)
             done_bars = int(width * done_percentage)
             empty_bars = width - done_bars
             sys.stderr.write('\r[{}{}] {:.2f} / {:.2f} MB'.format('=' * done_bars, ' ' * empty_bars,
-                old_div(float(len(data)), (1024**2)), (old_div(float(total_size), (1024**2)))))
+                float(len(data)) / (1024**2), (float(total_size) / (1024**2))))
             sys.stderr.flush()
     sys.stderr.write('\n')
     return data
